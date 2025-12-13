@@ -71,7 +71,7 @@ def main(args: argparse.Namespace) -> None:
         )
     
     # DNS
-    dns_file = os.path.join(args.storage, 'logs_dns.h5')
+    dns_file = os.path.join(args.save_path, 'logs_dns.h5')
     if not os.path.isfile(dns_file):
         with h5py.File(dns_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -106,7 +106,7 @@ def main(args: argparse.Namespace) -> None:
         f_s = forcing_spectrum_coarse * forcing_det_coarse
         return f_s
     
-    nop_file = os.path.join(args.storage, 'logs_nop.h5')
+    nop_file = os.path.join(args.save_path, 'logs_nop.h5')
     if not os.path.isfile(nop_file):
         with h5py.File(nop_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -156,7 +156,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_off(om_s):
         return into_s(eq_off(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    off_file = os.path.join(args.storage, 'logs_off.h5')
+    off_file = os.path.join(args.save_path, 'logs_off.h5')
     if not os.path.isfile(off_file):
         with h5py.File(off_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -192,7 +192,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_ref(om_s):
         return into_s(eq_ref(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    ref_file = os.path.join(args.storage, 'logs_state_ref_ek.h5')
+    ref_file = os.path.join(args.save_path, 'logs_state_ref_ek.h5')
     if not os.path.isfile(ref_file):
         with h5py.File(ref_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -228,7 +228,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_ref(om_s):
         return into_s(eq_ref(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    ref_file = os.path.join(args.storage, 'logs_subgrid_ref_mse.h5')
+    ref_file = os.path.join(args.save_path, 'logs_subgrid_ref_mse.h5')
     if not os.path.isfile(ref_file):
         with h5py.File(ref_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -264,7 +264,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_state_small(om_s):
         return into_s(eq_state_small(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    state_small_file = os.path.join(args.storage, 'logs_state_small_ek.h5')
+    state_small_file = os.path.join(args.save_path, 'logs_state_small_ek.h5')
     if not os.path.isfile(state_small_file):
         with h5py.File(state_small_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -300,7 +300,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_subgrid_small(om_s):
         return into_s(eq_subgrid_small(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    subgrid_small_file = os.path.join(args.storage, 'logs_subgrid_small_mse.h5')
+    subgrid_small_file = os.path.join(args.save_path, 'logs_subgrid_small_mse.h5')
     if not os.path.isfile(subgrid_small_file):
         with h5py.File(subgrid_small_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -336,7 +336,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_state_large(om_s):
         return into_s(eq_state_large(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    state_large_file = os.path.join(args.storage, 'logs_state_large_ek.h5')
+    state_large_file = os.path.join(args.save_path, 'logs_state_large_ek.h5')
     if not os.path.isfile(state_large_file):
         with h5py.File(state_large_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -372,7 +372,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_subgrid_large(om_s):
         return into_s(eq_subgrid_large(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    subgrid_large_file = os.path.join(args.storage, 'logs_subgrid_large_mse.h5')
+    subgrid_large_file = os.path.join(args.save_path, 'logs_subgrid_large_mse.h5')
     if not os.path.isfile(subgrid_large_file):
         with h5py.File(subgrid_large_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -442,7 +442,7 @@ if __name__ == '__main__':
     )
     
     parser.add_argument('-n', '--name', type=str, help='Name of the configuration', required=True)
-    parser.add_argument('-s', '--storage', type=str, help='Path for the snapshots storage', required=True)
+    parser.add_argument('--save_path', type=str, help='File path for saving the field samples', required=True)
 
     parser.add_argument('-n_logs', type=int, help='Number of saved snapshots', required=True)
     parser.add_argument('-T', type=float, help='Final time of the integration', required=True)
