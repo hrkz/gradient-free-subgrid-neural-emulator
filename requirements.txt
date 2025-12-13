@@ -1,0 +1,7 @@
+jax[cuda12]
+flax
+optax
+h5py
+matplotlib
+jupyter
+tqdm
