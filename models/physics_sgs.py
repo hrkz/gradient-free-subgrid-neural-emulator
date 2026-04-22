@@ -57,7 +57,7 @@ def leith(
         om_x = from_s_pad(1j * eq.k_x * om_s, eq.n_x, eq.n_y)
         om_y = from_s_pad(1j * eq.k_y * om_s, eq.n_x, eq.n_y)
         delta = (2 * jnp.pi) / max(eq.n_x, eq.n_y)
-        return (C_L * delta)**3 * jnp.sqrt(2 * (om_x**2 + om_y**2))
+        return (C_L * delta)**3 * jnp.sqrt(om_x**2 + om_y**2)
     return jax.tree_util.Partial(
         strain_rate_sgs, eq, __impl__
     )
