@@ -8,20 +8,14 @@
 
 To setup and run the Python scripts and notebooks, we use [uv](https://docs.astral.sh/uv/) to manage the package dependencies in a custom environment
 
-1. **Create and activate the environment**
+1. **Setup the environment**
 
 ```bash
 cd gradient-free-subgrid-neural-emulator
-uv init
+uv sync
 ```
 
-2. **Install the required packages**
-
-```bash
-uv add -r requirements.txt
-```
-
-Note: you need the access to a GPU device since the default requirement packages are based on the CUDA version of JAX. Running the code on CPU is posible, but modification of the `requirements.txt` file is necessary.
+Note: you need the access to a GPU device since the default requirement packages are based on the CUDA version of JAX. Running the code on CPU is posible, but modification of the `pyproject.toml` file is necessary.
 
 ## 🚀 Reproducing results
 
@@ -45,7 +39,7 @@ Once finished, the training checkpoint are saved in `data/l96/` and we can use t
 
 #### Evaluating the models
 
-Finally, we want to evaluate the trained models and their performance and launch the `docs/l96_eval.ipynb` notebook. Simulations for the two-timescale system and the SGS models are run for $300 t_c$, equivalent to 600000 and 30000 time steps, respectively. The following cells can be used to compute and visualise the metrics described in the paper.
+Finally, we want to evaluate the trained models and their performance and launch the `docs/l96_eval.ipynb` notebook. Simulations for the two-timescale system and the SGS models are run for $300 t_c$, equivalent to 1800000 and 90000 time steps, respectively. The following cells can be used to compute and visualise the metrics described in the paper.
 
 ### 🌊 Application: quasi-geostrophic dynamics
 

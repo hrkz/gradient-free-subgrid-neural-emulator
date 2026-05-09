@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 
 plt.rcParams.update({
-  'mathtext.fontset': 'cm'
+    'mathtext.fontset': 'cm'
 })
 
 import numpy as np
@@ -14,7 +14,7 @@ import jax.numpy as jnp
 import jax.random as jnr
 
 jax.config.update(
-  'jax_enable_x64', True
+    'jax_enable_x64', True
 )
 
 import models.time_solver as stepper
@@ -30,8 +30,7 @@ from utils import (
 
 def main(args: argparse.Namespace) -> None:
     print(args)
-    key_seed = 42
-    key = jnr.key(key_seed)
+    key = jnr.key(42)
     
     eq = QgPeriodic(
         nu=args.nu,

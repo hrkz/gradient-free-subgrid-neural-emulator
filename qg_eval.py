@@ -12,7 +12,7 @@ from flax import nnx
 import orbax.checkpoint as ocp
 
 jax.config.update(
-  'jax_enable_x64', True
+    'jax_enable_x64', True
 )
 
 from typing import Callable, Optional
@@ -134,8 +134,8 @@ def main(args: argparse.Namespace) -> None:
         kernel_size=5,
         out_features=1,
         n_blocks=args.ml_model_blocks,
-        means=jnp.zeros_like(eq_coarse.lap), 
-        stds=jnp.zeros_like(eq_coarse.lap),
+        means=0,
+        stds=1,
         activation=nnx.relu,
         rngs=nnx.Rngs(42)
     ))
@@ -144,9 +144,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'off_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_off = nnx.merge(graph, state)
 
     def source_off(om_s, t):
@@ -180,9 +178,7 @@ def main(args: argparse.Namespace) -> None:
     
     checkpoint_path = os.path.join(data_path, 'state_ref_ek_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_ref = nnx.merge(graph, state)
 
     def source_ref(om_s, t):
@@ -216,9 +212,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'subgrid_ref_mse_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_ref = nnx.merge(graph, state)
 
     def source_ref(om_s, t):
@@ -252,9 +246,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'state_small_ek_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_state_small = nnx.merge(graph, state)
 
     def source_state_small(om_s, t):
@@ -288,9 +280,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'subgrid_small_mse_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_subgrid_small = nnx.merge(graph, state)
 
     def source_subgrid_small(om_s, t):
@@ -324,9 +314,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'state_large_ek_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_state_large = nnx.merge(graph, state)
 
     def source_state_large(om_s, t):
@@ -360,9 +348,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'subgrid_large_mse_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_subgrid_large = nnx.merge(graph, state)
 
     def source_subgrid_large(om_s, t):

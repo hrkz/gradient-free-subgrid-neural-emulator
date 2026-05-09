@@ -1,0 +1,15 @@
+[project]
+name = "gradient-free-subgrid-neural-emulator"
+version = "0.1.0"
+description = "Implementation for the paper \"Gradient-free online learning of subgrid-scale dynamics with neural emulators\""
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flax>=0.12.7",
+    "h5py>=3.16.0",
+    "jax[cuda12]>=0.10.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.9",
+    "optax>=0.2.8",
+    "tqdm>=4.67.3",
+]

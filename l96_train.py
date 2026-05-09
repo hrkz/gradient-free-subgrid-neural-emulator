@@ -10,7 +10,7 @@ import jax.numpy as jnp
 import jax.random as jnr
 
 jax.config.update(
-  'jax_enable_x64', True
+    'jax_enable_x64', True
 )
 
 from flax import nnx
@@ -122,7 +122,7 @@ def main(args: argparse.Namespace) -> None:
         optimizer.update(eq_emu, grads)
         return loss
 
-    key = train_loop(
+    train_loop(
         key,
         optimizer=nnx.Optimizer(eq_emu, optax.adamw(args.emu_lr), wrt=nnx.Param),
         step_fn=emu_train_step,
@@ -208,7 +208,7 @@ def main(args: argparse.Namespace) -> None:
         optimizer.update(eq_ref, grads)
         return loss
 
-    key = train_loop(
+    train_loop(
         key,
         optimizer=nnx.Optimizer(eq_ref, optax.adamw(args.sgs_lr), wrt=nnx.Param),
         step_fn=ref_train_step,
@@ -249,9 +249,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'emu_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_emu = nnx.merge(graph, state)
 
     def state_flow_loss(
@@ -306,7 +304,7 @@ def main(args: argparse.Namespace) -> None:
         optimizer.update(eq_state, grads)
         return loss
 
-    key = train_loop(
+    train_loop(
         key,
         optimizer=nnx.Optimizer(eq_state, optax.adamw(args.sgs_lr), wrt=nnx.Param),
         step_fn=state_train_step,
@@ -388,7 +386,7 @@ def main(args: argparse.Namespace) -> None:
     subgrid_ref = np.copy(x_k_ref)
     subgrid_ref[:, 1:] = -((eq.h * eq.c) / eq.b) * np.sum(y_j_ref[:, 1:], axis=2)
 
-    key = train_loop(
+    train_loop(
         key,
         optimizer=nnx.Optimizer(eq_subgrid, optax.adamw(args.sgs_lr), wrt=nnx.Param),
         step_fn=subgrid_train_step,
@@ -448,7 +446,6 @@ def train_loop(
         checkpoint_path,
         state
     )
-    return key
 
 # Batch generator
 def batch_gen(

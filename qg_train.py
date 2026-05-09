@@ -10,7 +10,7 @@ import jax.numpy as jnp
 import jax.random as jnr
 
 jax.config.update(
-  'jax_enable_x64', True
+    'jax_enable_x64', True
 )
 
 from flax import nnx
@@ -250,7 +250,7 @@ def main(args: argparse.Namespace) -> None:
     print(eq_off)
 
     offline_steps_epochs = args.offline_epochs * n_trajs
-    offline_schedule = optax.cosine_decay_schedule(args.offline_lr, offline_steps_epochs, alpha=0.1)
+    offline_schedule = optax.cosine_decay_schedule(args.offline_lr, offline_steps_epochs, alpha=0.01)
 
     def off_loss(
         eq_off: nnx.Module, 
@@ -462,9 +462,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'emu_small_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_emu_small = nnx.merge(graph, state)
 
     eq_state_small = FwdCNN(
@@ -650,9 +648,7 @@ def main(args: argparse.Namespace) -> None:
 
     checkpoint_path = os.path.join(data_path, 'emu_large_checkpoint/')
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
-    import warnings
-    with warnings.catch_warnings(action='ignore'):
-        state = checkpointer.restore(checkpoint_path, abstract_state)
+    state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_emu_large = nnx.merge(graph, state)
 
     eq_state_large = FwdCNN(
@@ -874,7 +870,6 @@ def online_train_loop(
         checkpoint_path,
         state
     )
-    return key
         
 # Online (continuous) batch generator
 def online_batch_gen(
