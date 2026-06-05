@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 
 plt.rcParams.update({
-    'mathtext.fontset': 'cm'
+    "mathtext.fontset": "cm"
 })
 
 import numpy as np
@@ -14,7 +14,7 @@ import jax.numpy as jnp
 import jax.random as jnr
 
 jax.config.update(
-    'jax_enable_x64', True
+    "jax_enable_x64", True
 )
 
 import models.time_solver as stepper
@@ -71,8 +71,8 @@ def main(args: argparse.Namespace) -> None:
     eke_t = []
     ens_t = []
     
-    print('Running dynamical solver...')
-    pbar = tqdm.tqdm(range(iters), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+    print("Running dynamical solver...")
+    pbar = tqdm.tqdm(range(iters), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}")
     for i in pbar:
         c, om_s = solver(om_s, time)
         time += dt
@@ -90,54 +90,54 @@ def main(args: argparse.Namespace) -> None:
                 enstrophy(om_s)
             )
         if not np.isfinite(c):
-            print('Solver crashed with cfl =',c)
+            print("Solver crashed with cfl =",c)
             exit(1)
 
-    print('Saving snapshot...')
-    data_path = os.path.join(os.path.join(os.getcwd(), 'data'), args.name)
+    print("Saving snapshot...")
+    data_path = os.path.join(os.path.join(os.getcwd(), "data"), args.name)
     if not os.path.exists(data_path):
         os.makedirs(data_path)
     eq.save(
-        os.path.join(data_path, 'spinup.h5'),
+        os.path.join(data_path, "spinup.h5"),
         args.T, 
         om_s,
     )
     fig, axs = plt.subplots(ncols=2, nrows=1, figsize=(7.0, 4.0), dpi=120)
 
     axs[0].plot(time_t, eke_t, color='k')
-    axs[0].set_xlabel(r'$t$', fontsize=15)
-    axs[0].set_ylabel(r'$E(t)$', fontsize=15)
-    axs[0].tick_params(reset=True, axis='both', which='both', direction='in')
+    axs[0].set_xlabel(r"$t$", fontsize=15)
+    axs[0].set_ylabel(r"$E(t)$", fontsize=15)
+    axs[0].tick_params(reset=True, axis="both", which="both", direction="in")
     
     axs[1].plot(time_t, ens_t, color='k')
-    axs[1].set_xlabel(r'$t$', fontsize=15)
-    axs[1].set_ylabel(r'$Z(t)$', fontsize=15)
-    axs[1].tick_params(reset=True, axis='both', which='both', direction='in')
+    axs[1].set_xlabel(r"$t$", fontsize=15)
+    axs[1].set_ylabel(r"$Z(t)$", fontsize=15)
+    axs[1].tick_params(reset=True, axis="both", which="both", direction="in")
     
     fig.tight_layout()
     fig.savefig(
-        os.path.join(data_path, 'spinup_integrals.pdf')
+        os.path.join(data_path, "spinup_integrals.pdf")
     )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog='python spinup.py',
-        description='Integrate a periodic QG system configuration to time T (spinup) and save a snapshot for dataset generation.'
+        prog="python spinup.py",
+        description="Integrate a periodic QG system configuration to time T (spinup) and save a snapshot for dataset generation."
     )
     
-    parser.add_argument('-n', '--name', type=str, help='Name of the configuration', required=True)
-    parser.add_argument('-nu', type=float, help='Kinematic viscosity', required=True)
-    parser.add_argument('-mu', type=float, help='Linear drag coefficient', required=True)
-    parser.add_argument('-beta', type=float, help='Beta plane coefficient', required=True)
+    parser.add_argument("-n", "--name", type=str, help="Name of the configuration", required=True)
+    parser.add_argument("-nu", type=float, help="Kinematic viscosity", required=True)
+    parser.add_argument("-mu", type=float, help="Linear drag coefficient", required=True)
+    parser.add_argument("-beta", type=float, help="Beta plane coefficient", required=True)
 
-    parser.add_argument('-sigma', type=float, help='Forcing amplitude', required=True)
-    parser.add_argument('-k_f', type=float, help='Forcing wavenumber', required=True)
+    parser.add_argument("-sigma", type=float, help="Forcing amplitude", required=True)
+    parser.add_argument("-k_f", type=float, help="Forcing wavenumber", required=True)
 
-    parser.add_argument('-n_kx', type=int, help='Number of Fourier coefficients (x-direction)', required=True)
-    parser.add_argument('-n_ky', type=int, help='Number of Fourier coefficients (y-direction)', required=True) 
+    parser.add_argument("-n_kx", type=int, help="Number of Fourier coefficients (x-direction)", required=True)
+    parser.add_argument("-n_ky", type=int, help="Number of Fourier coefficients (y-direction)", required=True) 
 
-    parser.add_argument('-dt', type=float, help='Discrete (fixed) time step', required=True)
-    parser.add_argument('-T', type=float, help='Final time of the integration', required=True)
+    parser.add_argument("-dt", type=float, help="Discrete (fixed) time step", required=True)
+    parser.add_argument("-T", type=float, help="Final time of the integration", required=True)
     
     args = parser.parse_args()
     main(args)

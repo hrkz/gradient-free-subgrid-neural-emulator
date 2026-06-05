@@ -10,23 +10,21 @@ import jax.numpy as jnp
 import jax.random as jnr
 
 jax.config.update(
-    'jax_enable_x64', True
+    "jax_enable_x64", True
 )
 
 from flax import nnx
 import optax
 import orbax.checkpoint as ocp
 
-from typing import Callable, Optional
+from typing import Callable
 
 import models.time_solver as stepper
 from models.qg_periodic import (
     QgPeriodic, 
     dynamical_solver,
     divergence,
-    average,
     kinetic_energy,
-    enstrophy,
 )
 from models.cnn import (
     FwdCNN,
@@ -41,22 +39,22 @@ def main(args: argparse.Namespace) -> None:
     key = jnr.key(42)
     rngs = nnx.Rngs(key)
     
-    data_path = os.path.join(os.path.join(os.getcwd(), 'data'), args.name)
-    with h5py.File(os.path.join(data_path, 'datasets.h5'), 'r') as f:
-        dt = f.attrs['dt']
-        ratio = f.attrs['ratio']
-        n_steps = f.attrs['n_steps']
-        n_trajs = f.attrs['n_trajs']
+    data_path = os.path.join(os.path.join(os.getcwd(), "data"), args.name)
+    with h5py.File(os.path.join(data_path, "datasets.h5"), 'r') as f:
+        dt = f.attrs["dt"]
+        ratio = f.attrs["ratio"]
+        n_steps = f.attrs["n_steps"]
+        n_trajs = f.attrs["n_trajs"]
 
-        sigma = f.attrs['sigma']
-        k_f = f.attrs['k_f']
+        sigma = f.attrs["sigma"]
+        k_f = f.attrs["k_f"]
 
-        om_c_ref = np.array(f['om_c_ref'])
-        tau_x_ref = np.array(f['tau_x_ref'])
-        tau_y_ref = np.array(f['tau_y_ref'])
-        om_c_emu = np.array(f['om_c_emu'])
+        om_c_ref = np.array(f["om_c_ref"])
+        tau_x_ref = np.array(f["tau_x_ref"])
+        tau_y_ref = np.array(f["tau_y_ref"])
+        om_c_emu = np.array(f["om_c_emu"])
     eq, _, _ = QgPeriodic.load(
-        os.path.join(data_path, 'snapshot.h5')
+        os.path.join(data_path, "snapshot.h5")
     )
 
     eq_coarse = QgPeriodic(
@@ -104,7 +102,7 @@ def main(args: argparse.Namespace) -> None:
     om_c_emu_std = np.std(om_emu)
 
     with np.printoptions(precision=4):
-        print('Emulator dataset statistics: om_c = {} ± σ({})'.format(
+        print("Emulator dataset statistics: om_c = {} ± σ({})".format(
             om_c_emu_mean, 
             om_c_emu_std
         ))
@@ -175,7 +173,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Emulator (small) architecture')
+    print("Emulator (small) architecture")
     print(eq_emu_small)
 
     online_train_loop(
@@ -189,7 +187,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='emu_small'
+        name="emu_small"
     )
 
     eq_emu_large = ResCNN(
@@ -203,7 +201,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Emulator (large) architecture')
+    print("Emulator (large) architecture")
     print(eq_emu_large)
 
     online_train_loop(
@@ -217,7 +215,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='emu_large'
+        name="emu_large"
     )
 
     # Get "physical" reference data
@@ -230,7 +228,7 @@ def main(args: argparse.Namespace) -> None:
     om_c_ref_std = np.std(om_ref)
 
     with np.printoptions(precision=4):
-        print('Reference online model correction dataset statistics: om_c = {} ± σ({})'.format(
+        print("Reference online model correction dataset statistics: om_c = {} ± σ({})".format(
             om_c_ref_mean, 
             om_c_ref_std
         ))
@@ -246,7 +244,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Offline model correction architecture')
+    print("Offline model correction architecture")
     print(eq_off)
 
     offline_steps_epochs = args.offline_epochs * n_trajs
@@ -290,7 +288,7 @@ def main(args: argparse.Namespace) -> None:
         epochs=args.offline_epochs,
         batch_size=n_steps,
         data_path=data_path,
-        name='off'
+        name="off"
     )
 
     eq_state_ref = FwdCNN(
@@ -304,7 +302,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Reference (state) online model correction architecture')
+    print("Reference (state) online model correction architecture")
     print(eq_state_ref)
 
     state_steps_epochs = args.state_epochs * n_trajs
@@ -364,7 +362,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='state_ref_ek'
+        name="state_ref_ek"
     )
 
     sgs_c_ref = np.zeros((n_trajs, n_steps, eq_coarse.n_ky, eq_coarse.n_kx), dtype=np.complex128)
@@ -382,7 +380,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    #print('Reference (subgrid) online model correction architecture')
+    #print("Reference (subgrid) online model correction architecture")
     #print(eq_subgrid_ref)
 
     subgrid_steps_epochs = args.subgrid_epochs * n_trajs
@@ -443,7 +441,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='subgrid_ref_mse'
+        name="subgrid_ref_mse"
     )
 
     abstract_model = nnx.eval_shape(lambda: ResCNN(
@@ -460,7 +458,7 @@ def main(args: argparse.Namespace) -> None:
 
     graph, abstract_state = nnx.split(abstract_model)
 
-    checkpoint_path = os.path.join(data_path, 'emu_small_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "emu_small_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_emu_small = nnx.merge(graph, state)
@@ -476,7 +474,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    #print('Emulator-based model architecture (state loss, small emulator)')
+    #print("Emulator-based model architecture (state loss, small emulator)")
     #print(eq_state_small)
 
     def state_small_flow_loss(
@@ -545,7 +543,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='state_small_ek'
+        name="state_small_ek"
     )
 
     eq_subgrid_small = FwdCNN(
@@ -559,7 +557,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    #print('Emulator-based model architecture (subgrid loss, small emulator)')
+    #print("Emulator-based model architecture (subgrid loss, small emulator)")
     #print(eq_subgrid_small)
 
     def subgrid_small_flow_loss(
@@ -629,7 +627,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='subgrid_small_mse'
+        name="subgrid_small_mse"
     )
 
     abstract_model = nnx.eval_shape(lambda: ResCNN(
@@ -646,7 +644,7 @@ def main(args: argparse.Namespace) -> None:
 
     graph, abstract_state = nnx.split(abstract_model)
 
-    checkpoint_path = os.path.join(data_path, 'emu_large_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "emu_large_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_emu_large = nnx.merge(graph, state)
@@ -662,7 +660,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    #print('Emulator-based model architecture (state loss, large emulator)')
+    #print("Emulator-based model architecture (state loss, large emulator)")
     #print(eq_state_large)
 
     def state_large_flow_loss(
@@ -731,7 +729,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='state_large_ek'
+        name="state_large_ek"
     )
 
     eq_subgrid_large = FwdCNN(
@@ -745,7 +743,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    #print('Emulator-based model architecture (subgrid loss, large emulator)')
+    #print("Emulator-based model architecture (subgrid loss, large emulator)")
     #print(eq_subgrid_large)
 
     def subgrid_large_flow_loss(
@@ -815,7 +813,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='subgrid_large_mse'
+        name="subgrid_large_mse"
     )
 
 def online_train_loop(
@@ -832,8 +830,8 @@ def online_train_loop(
     name: str
 ):
     train_loss = []
-    print('Training `' + name + '`...')
-    pbar = tqdm.tqdm(range(epochs), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+    print("Training `" + name + "`...")
+    pbar = tqdm.tqdm(range(epochs), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}")
     for i in pbar:
         # linear schedule
         cur_steps = n_steps if i >= curriculum_epochs else int(1 + max(1, i * n_steps / curriculum_epochs))
@@ -859,10 +857,10 @@ def online_train_loop(
                 refresh=False
             )
         train_loss.append(t_loss / n_trajs)
-    np.savez(os.path.join(data_path, name + '_loss.npz'), loss=train_loss)
-    print('Saving `' + name + '` parameters...')
+    np.savez(os.path.join(data_path, name + "_loss.npz"), loss=train_loss)
+    print("Saving `" + name + "` parameters...")
     _, state = nnx.split(model)
-    checkpoint_path = os.path.join(data_path, name + '_checkpoint/')
+    checkpoint_path = os.path.join(data_path, name + "_checkpoint/")
     if os.path.exists(checkpoint_path):
         shutil.rmtree(checkpoint_path)
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
@@ -910,8 +908,8 @@ def offline_train_loop(
     name: str
 ):
     train_loss = []
-    print('Training `' + name + '`...')
-    pbar = tqdm.tqdm(range(epochs), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+    print("Training `" + name + "`...")
+    pbar = tqdm.tqdm(range(epochs), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}")
     for i in pbar:
         key, subkey = jnr.split(key)
         inputs, targets = dataset
@@ -936,10 +934,10 @@ def offline_train_loop(
                 refresh=False
             )
         train_loss.append(t_loss / n_batches)
-    np.savez(os.path.join(data_path, name + '_loss.npz'), loss=train_loss)
-    print('Saving `' + name + '` parameters...')
+    np.savez(os.path.join(data_path, name + "_loss.npz"), loss=train_loss)
+    print("Saving `" + name + "` parameters...")
     _, state = nnx.split(model)
-    checkpoint_path = os.path.join(data_path, name + '_checkpoint/')
+    checkpoint_path = os.path.join(data_path, name + "_checkpoint/")
     if os.path.exists(checkpoint_path):
         shutil.rmtree(checkpoint_path)
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
@@ -977,34 +975,34 @@ def offline_batch_gen(
             jnp.array(targets[curr_idx])
         )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog='python qg_train.py',
-        description='Full tranining pipeline for the QG neural emulation and subgrid modeling'
+        prog="python qg_train.py",
+        description="Full tranining pipeline for the QG neural emulation and subgrid modeling"
     )
     
-    parser.add_argument('-n', '--name', type=str, help='Name of the configuration', required=True)
+    parser.add_argument("-n", "--name", type=str, help="Name of the configuration", required=True)
 
-    parser.add_argument('-emu_blocks_small', type=int, help='Number of MLP blocks for the (small) emulator', required=True)
-    parser.add_argument('-emu_kernel_small', type=int, help='Kernel size for the (small) emulator', required=True)
-    parser.add_argument('-emu_latent_small', type=int, help='Size of the latent space for the (small) emulator', required=True)
-    parser.add_argument('-emu_blocks_large', type=int, help='Number of MLP blocks for the (large) emulator', required=True)
-    parser.add_argument('-emu_kernel_large', type=int, help='Kernel size for the (large) emulator', required=True)
-    parser.add_argument('-emu_latent_large', type=int, help='Size of the latent space for the (large) emulator', required=True)
-    parser.add_argument('-emu_epochs', type=int, help='Number of trainig epochs for the emulator', required=True)
-    parser.add_argument('-emu_lr', type=float, help='Learning rate for the emulator training', required=True)
+    parser.add_argument("-emu_blocks_small", type=int, help="Number of MLP blocks for the (small) emulator", required=True)
+    parser.add_argument("-emu_kernel_small", type=int, help="Kernel size for the (small) emulator", required=True)
+    parser.add_argument("-emu_latent_small", type=int, help="Size of the latent space for the (small) emulator", required=True)
+    parser.add_argument("-emu_blocks_large", type=int, help="Number of MLP blocks for the (large) emulator", required=True)
+    parser.add_argument("-emu_kernel_large", type=int, help="Kernel size for the (large) emulator", required=True)
+    parser.add_argument("-emu_latent_large", type=int, help="Size of the latent space for the (large) emulator", required=True)
+    parser.add_argument("-emu_epochs", type=int, help="Number of trainig epochs for the emulator", required=True)
+    parser.add_argument("-emu_lr", type=float, help="Learning rate for the emulator training", required=True)
 
-    parser.add_argument('-sgs_blocks', type=int, help='Number of CNNNext blocks for the SGS model correction', required=True)
-    parser.add_argument('-sgs_latent', type=int, help='Size of the latent space for the SGS model correction', required=True)
+    parser.add_argument("-sgs_blocks", type=int, help="Number of CNNNext blocks for the SGS model correction", required=True)
+    parser.add_argument("-sgs_latent", type=int, help="Size of the latent space for the SGS model correction", required=True)
     
-    parser.add_argument('-state_epochs', type=int, help='Number of trainig epochs for the offline SGS model correction', required=True)
-    parser.add_argument('-state_lr', type=float, help='Learning rate for the offline SGS model correction training', required=True)
+    parser.add_argument("-state_epochs", type=int, help="Number of trainig epochs for the offline SGS model correction", required=True)
+    parser.add_argument("-state_lr", type=float, help="Learning rate for the offline SGS model correction training", required=True)
     
-    parser.add_argument('-subgrid_epochs', type=int, help='Number of trainig epochs for the online SGS model correction', required=True)
-    parser.add_argument('-subgrid_lr', type=float, help='Learning rate for the online SGS model correction training', required=True)
+    parser.add_argument("-subgrid_epochs", type=int, help="Number of trainig epochs for the online SGS model correction", required=True)
+    parser.add_argument("-subgrid_lr", type=float, help="Learning rate for the online SGS model correction training", required=True)
 
-    parser.add_argument('-offline_epochs', type=int, help='Number of trainig epochs for the online SGS model correction', required=True)
-    parser.add_argument('-offline_lr', type=float, help='Learning rate for the online SGS model correction training', required=True)
+    parser.add_argument("-offline_epochs", type=int, help="Number of trainig epochs for the online SGS model correction", required=True)
+    parser.add_argument("-offline_lr", type=float, help="Learning rate for the online SGS model correction training", required=True)
     
     args = parser.parse_args()
     main(args)

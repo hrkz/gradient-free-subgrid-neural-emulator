@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import jax
 import jax.numpy as jnp
 
-from typing import Optional, Tuple
-
 def spectral_pad(
     f_s: jnp.ndarray,
     n_kx: int,
@@ -32,13 +30,13 @@ def from_s_pad(f_s: jnp.ndarray, n_x: int, n_y: int) -> jnp.ndarray:
     """Transform back Fourier coefficients on the *2D* grid, with 3/2 dealiasing."""
     n_ky, n_kx = f_s.shape
     f_s = spectral_pad(f_s, n_kx, n_ky, n_x//2 + 1, n_y)
-    f_g = jnp.fft.irfft2(f_s, norm='forward', s=(n_y, n_x))
+    f_g = jnp.fft.irfft2(f_s, norm="forward", s=(n_y, n_x))
     return f_g
 
 def into_s(f_g: jnp.ndarray) -> jnp.ndarray:
     """Transform *2D* grid values into Fourier coefficients."""
-    return jnp.fft.rfft2(f_g, norm='forward')
+    return jnp.fft.rfft2(f_g, norm="forward")
 
 def from_s(f_s: jnp.ndarray) -> jnp.ndarray:
     """Transform back Fourier coefficients on the *2D* grid."""
-    return jnp.fft.irfft2(f_s, norm='forward')
+    return jnp.fft.irfft2(f_s, norm="forward")

@@ -44,44 +44,44 @@ class QgPeriodic:
         self.k_y = np.fft. fftfreq(self.n_ky, 1 / self.n_ky).reshape((-1, 1))
         self.lap = self.k_x**2 + self.k_y**2
 
-        with np.errstate(divide='ignore'):
+        with np.errstate(divide="ignore"):
             self.ilap = 1 / self.lap
             self.ilap[0, 0] = 0
 
     def save(self, filename: str, time: float, om_s: jnp.ndarray):
         with h5py.File(filename, 'w') as f:
-            f.attrs['nu'] = self.nu
-            f.attrs['mu'] = self.mu
-            f.attrs['beta'] = self.beta
+            f.attrs["nu"] = self.nu
+            f.attrs["mu"] = self.mu
+            f.attrs["beta"] = self.beta
             
-            f.attrs['n_kx'] = self.n_kx
-            f.attrs['n_ky'] = self.n_ky
+            f.attrs["n_kx"] = self.n_kx
+            f.attrs["n_ky"] = self.n_ky
 
-            f.attrs['time'] = time
+            f.attrs["time"] = time
             
-            f.create_dataset('om_s',
+            f.create_dataset("om_s",
                              data=np.array(om_s))
 
     def load(filename: str):
         with h5py.File(filename, 'r') as f:
             eq = QgPeriodic(
-                nu=f.attrs['nu'].item(),
-                mu=f.attrs['mu'].item(),
-                beta=f.attrs['beta'].item(), 
-                n_kx=f.attrs['n_kx'].item(),
-                n_ky=f.attrs['n_ky'].item()
+                nu=f.attrs["nu"].item(),
+                mu=f.attrs["mu"].item(),
+                beta=f.attrs["beta"].item(), 
+                n_kx=f.attrs["n_kx"].item(),
+                n_ky=f.attrs["n_ky"].item()
             )
             
             return (
                 eq,
-                f.attrs['time'].item(),
-                np.array(f['om_s']),
+                f.attrs["time"].item(),
+                np.array(f["om_s"]),
             )
 
     def __repr__(self):
-        return '''Doubly-periodic quasi-geostrophic system: 
+        return """Doubly-periodic quasi-geostrophic system: 
         Parameters: nu={}, mu={}, beta={}
-        Truncation: n_x={}, n_y={}'''.format(
+        Truncation: n_x={}, n_y={}""".format(
             self.nu,
             self.mu,
             self.beta,

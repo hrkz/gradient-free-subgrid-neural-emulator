@@ -12,7 +12,7 @@ from flax import nnx
 import orbax.checkpoint as ocp
 
 jax.config.update(
-    'jax_enable_x64', True
+    "jax_enable_x64", True
 )
 
 from typing import Callable, Optional
@@ -35,15 +35,15 @@ from utils import (
 
 def main(args: argparse.Namespace) -> None:
     print(args)
-    data_path = os.path.join(os.path.join(os.getcwd(), 'data'), args.name)
+    data_path = os.path.join(os.path.join(os.getcwd(), "data"), args.name)
 
-    with h5py.File(os.path.join(data_path, 'datasets.h5'), 'r') as f:
-        dt = f.attrs['dt']
-        ratio = f.attrs['ratio']
+    with h5py.File(os.path.join(data_path, "datasets.h5"), 'r') as f:
+        dt = f.attrs["dt"]
+        ratio = f.attrs["ratio"]
     
-        sigma = f.attrs['sigma']
-        k_f = f.attrs['k_f']
-    eq, t0, om_s = QgPeriodic.load(os.path.join(data_path, 'snapshot.h5'))
+        sigma = f.attrs["sigma"]
+        k_f = f.attrs["k_f"]
+    eq, t0, om_s = QgPeriodic.load(os.path.join(data_path, "snapshot.h5"))
     print(eq)
     
     eq_coarse = QgPeriodic(
@@ -71,7 +71,7 @@ def main(args: argparse.Namespace) -> None:
         )
     
     # DNS
-    dns_file = os.path.join(args.save_path, 'logs_dns.h5')
+    dns_file = os.path.join(args.save_path, "logs_dns.h5")
     if not os.path.isfile(dns_file):
         with h5py.File(dns_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -80,7 +80,7 @@ def main(args: argparse.Namespace) -> None:
                 source
             ))
 
-            print('Integrating DNS...')
+            print("Integrating DNS...")
             run_system(
                 eq,
                 solver,
@@ -106,7 +106,7 @@ def main(args: argparse.Namespace) -> None:
         f_s = forcing_spectrum_coarse * forcing_det_coarse
         return f_s
     
-    nop_file = os.path.join(args.save_path, 'logs_nop.h5')
+    nop_file = os.path.join(args.save_path, "logs_nop.h5")
     if not os.path.isfile(nop_file):
         with h5py.File(nop_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -115,7 +115,7 @@ def main(args: argparse.Namespace) -> None:
                 source_coarse
             ))
 
-            print('Integrating coarse-resolution (no model)...')
+            print("Integrating coarse-resolution (no model)...")
             run_system(
                 eq_coarse,
                 solver,
@@ -142,7 +142,7 @@ def main(args: argparse.Namespace) -> None:
     
     graph, abstract_state = nnx.split(abstract_model)
 
-    checkpoint_path = os.path.join(data_path, 'off_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "off_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_off = nnx.merge(graph, state)
@@ -154,7 +154,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_off(om_s):
         return into_s(eq_off(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    off_file = os.path.join(args.save_path, 'logs_off.h5')
+    off_file = os.path.join(args.save_path, "logs_off.h5")
     if not os.path.isfile(off_file):
         with h5py.File(off_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -163,7 +163,7 @@ def main(args: argparse.Namespace) -> None:
                 source_off
             ))
 
-            print('Integrating with offline model correction...')
+            print("Integrating with offline model correction...")
             run_system(
                 eq_coarse,
                 solver,
@@ -176,7 +176,7 @@ def main(args: argparse.Namespace) -> None:
                 file=f
             )
     
-    checkpoint_path = os.path.join(data_path, 'state_ref_ek_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "state_ref_ek_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_ref = nnx.merge(graph, state)
@@ -188,7 +188,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_ref(om_s):
         return into_s(eq_ref(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    ref_file = os.path.join(args.save_path, 'logs_state_ref_ek.h5')
+    ref_file = os.path.join(args.save_path, "logs_state_ref_ek.h5")
     if not os.path.isfile(ref_file):
         with h5py.File(ref_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -197,7 +197,7 @@ def main(args: argparse.Namespace) -> None:
                 source_ref
             ))
 
-            print('Integrating with reference (state) online model correction...')
+            print("Integrating with reference (state) online model correction...")
             run_system(
                 eq_coarse,
                 solver,
@@ -210,7 +210,7 @@ def main(args: argparse.Namespace) -> None:
                 file=f
             )
 
-    checkpoint_path = os.path.join(data_path, 'subgrid_ref_mse_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "subgrid_ref_mse_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_ref = nnx.merge(graph, state)
@@ -222,7 +222,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_ref(om_s):
         return into_s(eq_ref(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    ref_file = os.path.join(args.save_path, 'logs_subgrid_ref_mse.h5')
+    ref_file = os.path.join(args.save_path, "logs_subgrid_ref_mse.h5")
     if not os.path.isfile(ref_file):
         with h5py.File(ref_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -231,7 +231,7 @@ def main(args: argparse.Namespace) -> None:
                 source_ref
             ))
 
-            print('Integrating with reference (subgrid) online model correction...')
+            print("Integrating with reference (subgrid) online model correction...")
             run_system(
                 eq_coarse,
                 solver,
@@ -244,7 +244,7 @@ def main(args: argparse.Namespace) -> None:
                 file=f
             )
 
-    checkpoint_path = os.path.join(data_path, 'state_small_ek_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "state_small_ek_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_state_small = nnx.merge(graph, state)
@@ -256,7 +256,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_state_small(om_s):
         return into_s(eq_state_small(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    state_small_file = os.path.join(args.save_path, 'logs_state_small_ek.h5')
+    state_small_file = os.path.join(args.save_path, "logs_state_small_ek.h5")
     if not os.path.isfile(state_small_file):
         with h5py.File(state_small_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -265,7 +265,7 @@ def main(args: argparse.Namespace) -> None:
                 source_state_small
             ))
 
-            print('Integrating with emulator-based (state loss, small emulator) model correction...')
+            print("Integrating with emulator-based (state loss, small emulator) model correction...")
             run_system(
                 eq_coarse,
                 solver,
@@ -278,7 +278,7 @@ def main(args: argparse.Namespace) -> None:
                 file=f
             )
 
-    checkpoint_path = os.path.join(data_path, 'subgrid_small_mse_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "subgrid_small_mse_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_subgrid_small = nnx.merge(graph, state)
@@ -290,7 +290,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_subgrid_small(om_s):
         return into_s(eq_subgrid_small(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    subgrid_small_file = os.path.join(args.save_path, 'logs_subgrid_small_mse.h5')
+    subgrid_small_file = os.path.join(args.save_path, "logs_subgrid_small_mse.h5")
     if not os.path.isfile(subgrid_small_file):
         with h5py.File(subgrid_small_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -299,7 +299,7 @@ def main(args: argparse.Namespace) -> None:
                 source_subgrid_small
             ))
 
-            print('Integrating with emulator-based (subgrid loss, small emulator) model correction...')
+            print("Integrating with emulator-based (subgrid loss, small emulator) model correction...")
             run_system(
                 eq_coarse,
                 solver,
@@ -312,7 +312,7 @@ def main(args: argparse.Namespace) -> None:
                 file=f
             )
 
-    checkpoint_path = os.path.join(data_path, 'state_large_ek_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "state_large_ek_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_state_large = nnx.merge(graph, state)
@@ -324,7 +324,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_state_large(om_s):
         return into_s(eq_state_large(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    state_large_file = os.path.join(args.save_path, 'logs_state_large_ek.h5')
+    state_large_file = os.path.join(args.save_path, "logs_state_large_ek.h5")
     if not os.path.isfile(state_large_file):
         with h5py.File(state_large_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -333,7 +333,7 @@ def main(args: argparse.Namespace) -> None:
                 source_state_large
             ))
 
-            print('Integrating with emulator-based (state loss, large emulator) model correction...')
+            print("Integrating with emulator-based (state loss, large emulator) model correction...")
             run_system(
                 eq_coarse,
                 solver,
@@ -346,7 +346,7 @@ def main(args: argparse.Namespace) -> None:
                 file=f
             )
 
-    checkpoint_path = os.path.join(data_path, 'subgrid_large_mse_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "subgrid_large_mse_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_subgrid_large = nnx.merge(graph, state)
@@ -358,7 +358,7 @@ def main(args: argparse.Namespace) -> None:
     def compute_tau_subgrid_large(om_s):
         return into_s(eq_subgrid_large(jnp.expand_dims(from_s(om_s), (0,-1))).squeeze())
 
-    subgrid_large_file = os.path.join(args.save_path, 'logs_subgrid_large_mse.h5')
+    subgrid_large_file = os.path.join(args.save_path, "logs_subgrid_large_mse.h5")
     if not os.path.isfile(subgrid_large_file):
         with h5py.File(subgrid_large_file, 'w') as f:
             solver = jax.jit(dynamical_solver(
@@ -367,7 +367,7 @@ def main(args: argparse.Namespace) -> None:
                 source_subgrid_large
             ))
 
-            print('Integrating with emulator-based (subgrid loss, large emulator) model correction...')
+            print("Integrating with emulator-based (subgrid loss, large emulator) model correction...")
             run_system(
                 eq_coarse,
                 solver,
@@ -397,44 +397,44 @@ def run_system(
     sample_digits = len(str(int(iters / logs_freq)))
 
     time_t = []
-    pbar = tqdm.tqdm(range(iters), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+    pbar = tqdm.tqdm(range(iters), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}")
     for i in pbar:
         c, om_s = solver(om_s, time)
         time += dt
         if not np.isfinite(c):
-            print('Solver crashed with cfl =',c)
+            print("Solver crashed with cfl =",c)
             break
         if i % logs_freq == 0:
             time_t.append(time)
 
-            file.create_dataset('om_s_' + str(i // logs_freq).zfill(sample_digits), 
+            file.create_dataset("om_s_" + str(i // logs_freq).zfill(sample_digits), 
                                 data=np.array(om_s))
             if compute_tau != None:
                 tau = compute_tau(om_s)
-                file.create_dataset('tau_s_' + str(i // logs_freq).zfill(sample_digits), 
+                file.create_dataset("tau_s_" + str(i // logs_freq).zfill(sample_digits), 
                                     data=np.array(tau))
             
             pbar.set_postfix(
                 cfl=format(dt / c, ".2f"),
             )
-    file.attrs['digits'] = sample_digits
-    file.create_dataset('time',
+    file.attrs["digits"] = sample_digits
+    file.create_dataset("time",
                         data=np.array(time_t))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog='python eval.py',
-        description='Integrate reference DNS and multiple SGS models for the QG system and save states.'
+        prog="python eval.py",
+        description="Integrate reference DNS and multiple SGS models for the QG system and save states."
     )
     
-    parser.add_argument('-n', '--name', type=str, help='Name of the configuration', required=True)
-    parser.add_argument('--save_path', type=str, help='File path for saving the field samples', required=True)
+    parser.add_argument("-n", "--name", type=str, help="Name of the configuration", required=True)
+    parser.add_argument("--save_path", type=str, help="File path for saving the field samples", required=True)
 
-    parser.add_argument('-n_logs', type=int, help='Number of saved snapshots', required=True)
-    parser.add_argument('-T', type=float, help='Final time of the integration', required=True)
+    parser.add_argument("-n_logs", type=int, help="Number of saved snapshots", required=True)
+    parser.add_argument("-T", type=float, help="Final time of the integration", required=True)
 
-    parser.add_argument('-ml_model_blocks', type=int, help='Number of CNNNext blocks for the SGS model correction', required=True)
-    parser.add_argument('-ml_model_latent', type=int, help='Size of the latent space for the SGS model correction', required=True)
+    parser.add_argument("-ml_model_blocks", type=int, help="Number of CNNNext blocks for the SGS model correction", required=True)
+    parser.add_argument("-ml_model_latent", type=int, help="Size of the latent space for the SGS model correction", required=True)
     
     args = parser.parse_args()
     main(args)

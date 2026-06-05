@@ -10,7 +10,7 @@ import jax.numpy as jnp
 import jax.random as jnr
 
 jax.config.update(
-    'jax_enable_x64', True
+    "jax_enable_x64", True
 )
 
 from flax import nnx
@@ -22,7 +22,6 @@ from typing import Callable, Optional
 import models.time_solver as stepper
 from models.l96 import (
     L96, 
-    dynamical_solver,
     dynamical_solver_single
 )
 from models.mlp import (
@@ -34,18 +33,18 @@ def main(args: argparse.Namespace) -> None:
     key = jnr.key(42)
     rngs = nnx.Rngs(key)
     
-    data_path = os.path.join(os.path.join(os.getcwd(), 'data'), args.name)
-    with h5py.File(os.path.join(data_path, 'datasets.h5'), 'r') as f:
-        dt = f.attrs['dt']
-        n_steps = f.attrs['n_steps']
-        n_trajs = f.attrs['n_trajs']
-        source_val = f.attrs['source_val']
+    data_path = os.path.join(os.path.join(os.getcwd(), "data"), args.name)
+    with h5py.File(os.path.join(data_path, "datasets.h5"), 'r') as f:
+        dt = f.attrs["dt"]
+        n_steps = f.attrs["n_steps"]
+        n_trajs = f.attrs["n_trajs"]
+        source_val = f.attrs["source_val"]
 
-        x_k_ref = np.array(f['x_k_ref'])
-        y_j_ref = np.array(f['y_j_ref'])
-        x_k_emu = np.array(f['x_k_emu'])
-    eq, time, x_k, y_j = L96.load(
-        os.path.join(data_path, 'snapshot.h5')
+        x_k_ref = np.array(f["x_k_ref"])
+        y_j_ref = np.array(f["y_j_ref"])
+        x_k_emu = np.array(f["x_k_emu"])
+    eq, *_ = L96.load(
+        os.path.join(data_path, "snapshot.h5")
     )
     print(eq)
 
@@ -53,7 +52,7 @@ def main(args: argparse.Namespace) -> None:
     x_k_emu_stds = np.std(x_k_emu, axis=(0,1))
 
     with np.printoptions(precision=4):
-        print('Emulator dataset statistics: x_k = {} ± σ({})'.format(
+        print("Emulator dataset statistics: x_k = {} ± σ({})".format(
             x_k_emu_means, 
             x_k_emu_stds
         ))
@@ -68,7 +67,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Emulator architecture')
+    print("Emulator architecture")
     print(eq_emu)
 
     def emu_flow_loss(
@@ -132,14 +131,14 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='emu'
+        name="emu"
     )
 
     x_k_ref_means = np.mean(x_k_ref, axis=(0,1))
     x_k_ref_stds = np.std(x_k_ref, axis=(0,1))
 
     with np.printoptions(precision=4):
-        print('Reference (SGS model correction) dataset statistics: x_k = {} ± σ({})'.format(
+        print("Reference (SGS model correction) dataset statistics: x_k = {} ± σ({})".format(
             x_k_ref_means, 
             x_k_ref_stds
         ))
@@ -154,7 +153,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Reference (SGS model correction) architecture')
+    print("Reference (SGS model correction) architecture")
     print(eq_ref)
 
     # "Single-timescale" model, with N_j = 0
@@ -218,7 +217,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='ref'
+        name="ref"
     )
 
     eq_state = FwdMLP(
@@ -231,7 +230,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Emulator-based model architecture (state loss)')
+    print("Emulator-based model architecture (state loss)")
     #print(eq_state)
 
     abstract_model = nnx.eval_shape(lambda: ResMLP(
@@ -247,7 +246,7 @@ def main(args: argparse.Namespace) -> None:
 
     graph, abstract_state = nnx.split(abstract_model)
 
-    checkpoint_path = os.path.join(data_path, 'emu_checkpoint/')
+    checkpoint_path = os.path.join(data_path, "emu_checkpoint/")
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
     state = checkpointer.restore(checkpoint_path, abstract_state)
     eq_emu = nnx.merge(graph, state)
@@ -314,7 +313,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='state'
+        name="state"
     )
 
     eq_subgrid = FwdMLP(
@@ -327,7 +326,7 @@ def main(args: argparse.Namespace) -> None:
         activation=nnx.relu,
         rngs=rngs
     )
-    print('Emulator-based SGS model correction architecture (subgrid loss)')
+    print("Emulator-based SGS model correction architecture (subgrid loss)")
     #print(eq_subgrid)
 
     def subgrid_flow_loss(
@@ -396,7 +395,7 @@ def main(args: argparse.Namespace) -> None:
         n_steps=n_steps,
         n_trajs=n_trajs,
         data_path=data_path,
-        name='subgrid'
+        name="subgrid"
     )
 
 def train_loop(
@@ -412,8 +411,8 @@ def train_loop(
     name: str
 ):
     train_loss = []
-    print('Training `' + name + '`...')
-    pbar = tqdm.tqdm(range(epochs), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+    print("Training `" + name + "`...")
+    pbar = tqdm.tqdm(range(epochs), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}")
     for i in pbar:
         key, subkey = jnr.split(key)
         data_sample = batch_gen(
@@ -435,10 +434,10 @@ def train_loop(
                 refresh=False
             )
         train_loss.append(t_loss / n_trajs)
-    np.savez(os.path.join(data_path, name + '_loss.npz'), loss=train_loss)
-    print('Saving `' + name + '` parameters...')
+    np.savez(os.path.join(data_path, name + "_loss.npz"), loss=train_loss)
+    print("Saving `" + name + "` parameters...")
     _, state = nnx.split(model)
-    checkpoint_path = os.path.join(data_path, name + '_checkpoint/')
+    checkpoint_path = os.path.join(data_path, name + "_checkpoint/")
     if os.path.exists(checkpoint_path):
         shutil.rmtree(checkpoint_path)
     checkpointer = ocp.Checkpointer(ocp.StandardCheckpointHandler())
@@ -473,23 +472,23 @@ def batch_gen(
             jnp.array(batch_target)
         )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog='python l96_train.py',
-        description='Full tranining pipeline for the L96 neural emulation and subgrid modeling'
+        prog="python l96_train.py",
+        description="Full tranining pipeline for the L96 neural emulation and subgrid modeling"
     )
     
-    parser.add_argument('-n', '--name', type=str, help='Name of the configuration', required=True)
+    parser.add_argument("-n", "--name", type=str, help="Name of the configuration", required=True)
 
-    parser.add_argument('-emu_blocks', type=int, help='Number of MLP blocks for the emulator', required=True)
-    parser.add_argument('-emu_latent', type=int, help='Size of the latent space for the emulator', required=True)
-    parser.add_argument('-emu_epochs', type=int, help='Number of trainig epochs for the emulator', required=True)
-    parser.add_argument('-emu_lr', type=float, help='Learning rate for the emulator training', required=True)
+    parser.add_argument("-emu_blocks", type=int, help="Number of MLP blocks for the emulator", required=True)
+    parser.add_argument("-emu_latent", type=int, help="Size of the latent space for the emulator", required=True)
+    parser.add_argument("-emu_epochs", type=int, help="Number of trainig epochs for the emulator", required=True)
+    parser.add_argument("-emu_lr", type=float, help="Learning rate for the emulator training", required=True)
 
-    parser.add_argument('-sgs_blocks', type=int, help='Number of MLP blocks for the SGS model correction', required=True)
-    parser.add_argument('-sgs_latent', type=int, help='Size of the latent space for the SGS model correction', required=True)
-    parser.add_argument('-sgs_epochs', type=int, help='Number of trainig epochs for the SGS model correction', required=True)
-    parser.add_argument('-sgs_lr', type=float, help='Learning rate for the SGS model correction training', required=True)
+    parser.add_argument("-sgs_blocks", type=int, help="Number of MLP blocks for the SGS model correction", required=True)
+    parser.add_argument("-sgs_latent", type=int, help="Size of the latent space for the SGS model correction", required=True)
+    parser.add_argument("-sgs_epochs", type=int, help="Number of trainig epochs for the SGS model correction", required=True)
+    parser.add_argument("-sgs_lr", type=float, help="Learning rate for the SGS model correction training", required=True)
     
     args = parser.parse_args()
     main(args)

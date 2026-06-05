@@ -1,9 +1,8 @@
 import h5py
 import numpy as np
-import jax
 import jax.numpy as jnp
 
-from typing import Callable, Optional, Tuple
+from typing import Callable, Tuple
 
 from models.time_solver import OdeScheme
 
@@ -29,14 +28,14 @@ class L96:
             f.attrs['c'] = self.c
             f.attrs['h'] = self.h
             
-            f.attrs['n_k'] = self.n_k
-            f.attrs['n_j'] = self.n_j
+            f.attrs["n_k"] = self.n_k
+            f.attrs["n_j"] = self.n_j
             
-            f.attrs['time'] = time
+            f.attrs["time"] = time
             
-            f.create_dataset('x_k',
+            f.create_dataset("x_k",
                              data=np.array(x_k))
-            f.create_dataset('y_j',
+            f.create_dataset("y_j",
                              data=np.array(y_j))
 
     def load(filename: str):
@@ -45,21 +44,21 @@ class L96:
                 b=f.attrs['b'].item(),
                 c=f.attrs['c'].item(),
                 h=f.attrs['h'].item(), 
-                n_k=f.attrs['n_k'].item(),
-                n_j=f.attrs['n_j'].item()
+                n_k=f.attrs["n_k"].item(),
+                n_j=f.attrs["n_j"].item()
             )
             
             return (
                 eq,
-                f.attrs['time'].item(),
-                np.array(f['x_k']),
-                np.array(f['y_j'])
+                f.attrs["time"].item(),
+                np.array(f["x_k"]),
+                np.array(f["y_j"])
             )
 
     def __repr__(self):
-        return '''Two-time scale Lorenz 96 system: 
+        return """Two-time scale Lorenz 96 system: 
         Parameters: b={}, c={}, h={}
-        Truncation: n_x={}, n_j={}'''.format(
+        Truncation: n_x={}, n_j={}""".format(
             self.b,
             self.c,
             self.h,
