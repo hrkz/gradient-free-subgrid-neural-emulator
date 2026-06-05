@@ -17,7 +17,7 @@ from flax import nnx
 import optax
 import orbax.checkpoint as ocp
 
-from typing import Callable, Optional
+from typing import Callable
 
 import models.time_solver as stepper
 from models.l96 import (
@@ -34,7 +34,7 @@ def main(args: argparse.Namespace) -> None:
     rngs = nnx.Rngs(key)
     
     data_path = os.path.join(os.path.join(os.getcwd(), "data"), args.name)
-    with h5py.File(os.path.join(data_path, "datasets.h5"), 'r') as f:
+    with h5py.File(os.path.join(data_path, "datasets.h5"), "r") as f:
         dt = f.attrs["dt"]
         n_steps = f.attrs["n_steps"]
         n_trajs = f.attrs["n_trajs"]

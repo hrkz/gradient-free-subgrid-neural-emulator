@@ -3,10 +3,8 @@ import jax.numpy as jnp
 
 from typing import Callable
 
-from models.qg_periodic import (
-    QgPeriodic,
-)
-from utils import (
+from .qg_periodic import QgPeriodic
+from .spectral import (
     into_s_pad, 
     from_s_pad,
 )

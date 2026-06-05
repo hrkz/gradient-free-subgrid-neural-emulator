@@ -23,14 +23,14 @@ Below are the steps used to produce the results and figures from the paper. Thes
 
 ### 🌀 Demonstration: two-timescales Lorenz-96
 
-The first step for the demonstration is to launch the `docs/l96_data.ipynb` notebook. Here, the default parameters are set to the ones used in the paper. Running the cells until the `get_dataset_stats`, we obtain the number of steps $N_t$ for each trajectory, corresponding to 10% of the decorrelation time $t_c = 6$ of the system. The following cells will generate the datasets for both training the neural emulator and the subgrid-scale model.
+The first step for the demonstration is to launch the `notebooks/l96_data.ipynb` notebook. Here, the default parameters are set to the ones used in the paper. Running the cells until the `get_dataset_stats`, we obtain the number of steps $N_t$ for each trajectory, corresponding to 10% of the decorrelation time $t_c = 6$ of the system. The following cells will generate the datasets for both training the neural emulator and the subgrid-scale model.
 
 #### Training the models
 
 Now that the datasets have been saved in `data/l96/` (hence `-n l96`), we can launch the training script that sequentially train the neural emulator and then use it to train the SGS model. Following the learning setup described in Section 4, we run the following command:
 
 ```bash
-uv run l96_train.py -n l96 \
+uv run _l96_train.py -n l96 \
     -emu_blocks 3 -emu_latent 64 -emu_epochs 20000 -emu_lr 1e-5 \
     -sgs_blocks 3 -sgs_latent 16 -sgs_epochs 5000 -sgs_lr 2e-4
 ```
@@ -39,7 +39,7 @@ Once finished, the training checkpoint are saved in `data/l96/` and we can use t
 
 #### Evaluating the models
 
-Finally, we want to evaluate the trained models and their performance and launch the `docs/l96_eval.ipynb` notebook. Simulations for the two-timescale system and the SGS models are run for $300 t_c$, equivalent to 1800000 and 90000 time steps, respectively. The following cells can be used to compute and visualise the metrics described in the paper.
+Finally, we want to evaluate the trained models and their performance and launch the `notebooks/l96_eval.ipynb` notebook. Simulations for the two-timescale system and the SGS models are run for $300 t_c$, equivalent to 1800000 and 90000 time steps, respectively. The following cells can be used to compute and visualise the metrics described in the paper.
 
 ### 🌊 Application: quasi-geostrophic dynamics
 
@@ -47,7 +47,7 @@ In the paper, we describe a quasi-geostrophic configuration in a forced-dissiped
 To spinup the simulation and generate a snapshot, we run the following command (parameters are those used in the paper):
 
 ```bash
-uv run qg_spinup.py -n qg-det -nu 1e-5 -mu 2e-2 -beta 30 -sigma 10.0 -k_f 15 -n_kx 1025 -n_ky 2048 -dt 2e-4 -T 1000
+uv run _qg_spinup.py -n qg-det -nu 1e-5 -mu 2e-2 -beta 30 -sigma 10.0 -k_f 15 -n_kx 1025 -n_ky 2048 -dt 2e-4 -T 1000
 ```
 
 Upon finishing, the script saves a `snapshot.h5` file under the folder `data/qg-det`. Note that we did not evaluate the capabilities of our approach
@@ -55,12 +55,12 @@ on a variety of configurations (change in Coriolis parameter $\beta$, viscosity 
 
 #### Generating the coarse-grained dataset and traning the models
 
-We can now launch the notebook `docs/qg_data.ipynb` notebook. The first cells load the simulation state from the spinup file and run short simulations in order to evaluate some statitics, including the turnover time $t_L$ and the decorrelation time $t_c$. Providing the statistics to the `get_dataset_stats` function, we are given with the dataset parameters (number of samples from $N_\text{traj}$ trajectories of $N_t$ steps). The remaining cells show the effect of coarse-graining and generate the SGS and emulator datasets, respectively.
+We can now launch the notebook `notebooks/qg_data.ipynb` notebook. The first cells load the simulation state from the spinup file and run short simulations in order to evaluate some statitics, including the turnover time $t_L$ and the decorrelation time $t_c$. Providing the statistics to the `get_dataset_stats` function, we are given with the dataset parameters (number of samples from $N_\text{traj}$ trajectories of $N_t$ steps). The remaining cells show the effect of coarse-graining and generate the SGS and emulator datasets, respectively.
 
 The procedure to train the models is similar to the one used for the L96 demonstration. We run the following command using the learning parameters described in Section 5:
 
 ```bash
-uv run qg_train.py -n qg-det \
+uv run _qg_train.py -n qg-det \
     -emu_blocks_small 8 -emu_kernel_small 5 -emu_latent_small 32 \
     -emu_blocks_large 8 -emu_kernel_large 7 -emu_latent_large 64 \
     -emu_epochs 500 -emu_lr 1e-4 \
@@ -77,10 +77,10 @@ Once finished, the training checkpoint are saved in `data/qg-det/` and we can us
 Finally, we want to evaluate the trained models and baselines the reference DNS and some other baselines. We run the evaluation script for $t = 240$, corresponding to almost 300 turnovers, and save 2500 samples. Note that depending on the number of saved samples, the data generated by the evaluation can be large, hence, the script allows for generating data in a separate directory `my_path`:
 
 ```bash
-uv run qg_eval.py -n qg-det --save_path 'my_path' -n_logs 2500 -T 240 -ml_model_blocks 5 -ml_model_latent 64
+uv run _qg_eval.py -n qg-det --save_path 'my_path' -n_logs 2500 -T 240 -ml_model_blocks 5 -ml_model_latent 64
 ```
 
-We can now compute and visualise some metrics in the `docs/qg_metrics.ipynb` notebook. Note that the similarity metrics should only be computed for models that have not crashed in during the evaluation script.
+We can now compute and visualise some metrics in the `notebooks/qg_metrics.ipynb` notebook. Note that the similarity metrics should only be computed for models that have not crashed in during the evaluation script.
 
 ## 📖 Citing
 

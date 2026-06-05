@@ -1,7 +1,3 @@
-import tqdm
-import matplotlib.pyplot as plt
-
-import jax
 import jax.numpy as jnp
 
 def spectral_pad(

@@ -27,7 +27,7 @@ from models.qg_periodic import (
 from models.cnn import (
     FwdCNN,
 )
-from utils import (
+from models.spectral import (
     into_s,
     from_s,
     spectral_pad,
@@ -37,7 +37,7 @@ def main(args: argparse.Namespace) -> None:
     print(args)
     data_path = os.path.join(os.path.join(os.getcwd(), "data"), args.name)
 
-    with h5py.File(os.path.join(data_path, "datasets.h5"), 'r') as f:
+    with h5py.File(os.path.join(data_path, "datasets.h5"), "r") as f:
         dt = f.attrs["dt"]
         ratio = f.attrs["ratio"]
     
@@ -73,7 +73,7 @@ def main(args: argparse.Namespace) -> None:
     # DNS
     dns_file = os.path.join(args.save_path, "logs_dns.h5")
     if not os.path.isfile(dns_file):
-        with h5py.File(dns_file, 'w') as f:
+        with h5py.File(dns_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq,
                 stepper.BPR353(dt),
@@ -108,7 +108,7 @@ def main(args: argparse.Namespace) -> None:
     
     nop_file = os.path.join(args.save_path, "logs_nop.h5")
     if not os.path.isfile(nop_file):
-        with h5py.File(nop_file, 'w') as f:
+        with h5py.File(nop_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),
@@ -156,7 +156,7 @@ def main(args: argparse.Namespace) -> None:
 
     off_file = os.path.join(args.save_path, "logs_off.h5")
     if not os.path.isfile(off_file):
-        with h5py.File(off_file, 'w') as f:
+        with h5py.File(off_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),
@@ -190,7 +190,7 @@ def main(args: argparse.Namespace) -> None:
 
     ref_file = os.path.join(args.save_path, "logs_state_ref_ek.h5")
     if not os.path.isfile(ref_file):
-        with h5py.File(ref_file, 'w') as f:
+        with h5py.File(ref_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),
@@ -224,7 +224,7 @@ def main(args: argparse.Namespace) -> None:
 
     ref_file = os.path.join(args.save_path, "logs_subgrid_ref_mse.h5")
     if not os.path.isfile(ref_file):
-        with h5py.File(ref_file, 'w') as f:
+        with h5py.File(ref_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),
@@ -258,7 +258,7 @@ def main(args: argparse.Namespace) -> None:
 
     state_small_file = os.path.join(args.save_path, "logs_state_small_ek.h5")
     if not os.path.isfile(state_small_file):
-        with h5py.File(state_small_file, 'w') as f:
+        with h5py.File(state_small_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),
@@ -292,7 +292,7 @@ def main(args: argparse.Namespace) -> None:
 
     subgrid_small_file = os.path.join(args.save_path, "logs_subgrid_small_mse.h5")
     if not os.path.isfile(subgrid_small_file):
-        with h5py.File(subgrid_small_file, 'w') as f:
+        with h5py.File(subgrid_small_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),
@@ -326,7 +326,7 @@ def main(args: argparse.Namespace) -> None:
 
     state_large_file = os.path.join(args.save_path, "logs_state_large_ek.h5")
     if not os.path.isfile(state_large_file):
-        with h5py.File(state_large_file, 'w') as f:
+        with h5py.File(state_large_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),
@@ -360,7 +360,7 @@ def main(args: argparse.Namespace) -> None:
 
     subgrid_large_file = os.path.join(args.save_path, "logs_subgrid_large_mse.h5")
     if not os.path.isfile(subgrid_large_file):
-        with h5py.File(subgrid_large_file, 'w') as f:
+        with h5py.File(subgrid_large_file, "w") as f:
             solver = jax.jit(dynamical_solver(
                 eq_coarse,
                 stepper.BPR353(dt * ratio),

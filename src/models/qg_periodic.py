@@ -2,13 +2,11 @@ import h5py
 import numpy as np
 import jax
 import jax.numpy as jnp
-import jax.scipy as jns
-import jax.random as jnr
 
-from typing import Callable, Optional, Tuple
+from typing import Callable, Tuple
 
-from models.time_solver import ImexScheme
-from utils import (
+from .time_solver import ImexScheme
+from .spectral import (
     into_s_pad, 
     from_s_pad,
     spectral_pad,
@@ -49,7 +47,7 @@ class QgPeriodic:
             self.ilap[0, 0] = 0
 
     def save(self, filename: str, time: float, om_s: jnp.ndarray):
-        with h5py.File(filename, 'w') as f:
+        with h5py.File(filename, "w") as f:
             f.attrs["nu"] = self.nu
             f.attrs["mu"] = self.mu
             f.attrs["beta"] = self.beta
@@ -63,7 +61,7 @@ class QgPeriodic:
                              data=np.array(om_s))
 
     def load(filename: str):
-        with h5py.File(filename, 'r') as f:
+        with h5py.File(filename, "r") as f:
             eq = QgPeriodic(
                 nu=f.attrs["nu"].item(),
                 mu=f.attrs["mu"].item(),

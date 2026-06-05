@@ -4,7 +4,7 @@ import jax.numpy as jnp
 
 from typing import Callable, Tuple
 
-from models.time_solver import OdeScheme
+from .time_solver import OdeScheme
 
 class L96:
     def __init__(
@@ -23,10 +23,10 @@ class L96:
         self.n_j = n_j
 
     def save(self, filename: str, time: float, x_k: np.ndarray, y_j: np.ndarray):
-        with h5py.File(filename, 'w') as f:
-            f.attrs['b'] = self.b
-            f.attrs['c'] = self.c
-            f.attrs['h'] = self.h
+        with h5py.File(filename, "w") as f:
+            f.attrs["b"] = self.b
+            f.attrs["c"] = self.c
+            f.attrs["h"] = self.h
             
             f.attrs["n_k"] = self.n_k
             f.attrs["n_j"] = self.n_j
@@ -39,11 +39,11 @@ class L96:
                              data=np.array(y_j))
 
     def load(filename: str):
-        with h5py.File(filename, 'r') as f:
+        with h5py.File(filename, "r") as f:
             eq = L96(
-                b=f.attrs['b'].item(),
-                c=f.attrs['c'].item(),
-                h=f.attrs['h'].item(), 
+                b=f.attrs["b"].item(),
+                c=f.attrs["c"].item(),
+                h=f.attrs["h"].item(), 
                 n_k=f.attrs["n_k"].item(),
                 n_j=f.attrs["n_j"].item()
             )

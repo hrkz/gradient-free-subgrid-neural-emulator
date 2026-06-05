@@ -24,7 +24,7 @@ from models.qg_periodic import (
     kinetic_energy,
     enstrophy
 )
-from utils import (
+from models.spectral import (
     into_s,
 )
 
@@ -104,12 +104,12 @@ def main(args: argparse.Namespace) -> None:
     )
     fig, axs = plt.subplots(ncols=2, nrows=1, figsize=(7.0, 4.0), dpi=120)
 
-    axs[0].plot(time_t, eke_t, color='k')
+    axs[0].plot(time_t, eke_t, color="k")
     axs[0].set_xlabel(r"$t$", fontsize=15)
     axs[0].set_ylabel(r"$E(t)$", fontsize=15)
     axs[0].tick_params(reset=True, axis="both", which="both", direction="in")
     
-    axs[1].plot(time_t, ens_t, color='k')
+    axs[1].plot(time_t, ens_t, color="k")
     axs[1].set_xlabel(r"$t$", fontsize=15)
     axs[1].set_ylabel(r"$Z(t)$", fontsize=15)
     axs[1].tick_params(reset=True, axis="both", which="both", direction="in")
